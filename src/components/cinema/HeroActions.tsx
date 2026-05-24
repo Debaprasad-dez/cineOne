@@ -62,7 +62,7 @@ export default function HeroActions() {
 
   return (
     <div className="pointer-events-auto relative flex w-full flex-col items-center">
-      <div className="flex items-start justify-center gap-2.5">
+      <div className="grid w-full max-w-md grid-cols-2 gap-2 sm:flex sm:max-w-none sm:items-start sm:justify-center sm:gap-2.5">
         {actions.map((a, i) => (
           <motion.button
             key={a.label}
@@ -73,10 +73,8 @@ export default function HeroActions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ scale: 1.04 }}
-            className={`group relative flex h-10 w-36 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 font-ui text-xs font-semibold transition-colors disabled:opacity-50 ${
-              a.primary
-                ? 'bg-grad text-white shadow-glow-crimson'
-                : 'glass glass-hover text-text-primary'
+            className={`group relative flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 font-ui text-xs font-semibold transition-colors disabled:opacity-50 sm:h-10 sm:w-36 sm:shrink-0 ${
+              a.primary ? 'col-span-2 bg-grad text-white shadow-glow-crimson sm:col-span-1' : 'glass glass-hover text-text-primary'
             }`}
           >
             <span className="shrink-0 text-sm" style={{ color: a.primary ? '#fff' : 'var(--accent-gold)' }}>

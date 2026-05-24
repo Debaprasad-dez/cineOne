@@ -90,10 +90,10 @@ export default function Galaxy() {
       )}
 
       {/* Title + instructions */}
-      <div className="pointer-events-none absolute left-6 top-6 z-10">
-        <div className="eyebrow mb-1.5">{mode === 'cluster' ? 'Constellation view' : 'Time tunnel'}</div>
-        <h1 className="display-fluid text-3xl text-text-primary md:text-4xl">The Movie Galaxy</h1>
-        <p className="mt-1 font-mono text-xs text-text-muted">
+      <div className="pointer-events-none absolute left-4 top-4 z-10 max-w-[60vw] md:left-6 md:top-6 md:max-w-none">
+        <div className="eyebrow mb-1 hidden md:block">{mode === 'cluster' ? 'Constellation view' : 'Time tunnel'}</div>
+        <h1 className="display-fluid text-xl text-text-primary md:text-4xl">The Movie Galaxy</h1>
+        <p className="mt-1 hidden font-mono text-xs text-text-muted md:block">
           {mode === 'cluster' ? 'Drag to orbit · scroll to zoom · click a star' : 'Scroll to fly through the decades · click a film'}
         </p>
       </div>
@@ -107,9 +107,13 @@ export default function Galaxy() {
           setTunnelProgress(0);
           setMode((m) => (m === 'cluster' ? 'tunnel' : 'cluster'));
         }}
-        className="glass glass-hover absolute right-6 top-6 z-20 flex items-center gap-2 px-4 py-2.5 font-ui text-sm text-text-primary"
+        className="glass glass-hover absolute right-4 top-4 z-20 flex items-center gap-2 px-3 py-2 font-ui text-xs text-text-primary md:right-6 md:top-6 md:px-4 md:py-2.5 md:text-sm"
+        aria-label={mode === 'cluster' ? 'Travel through time' : 'Back to constellations'}
       >
-        {mode === 'cluster' ? '⟳ Travel Through Time' : '✦ Back to Constellations'}
+        <span>{mode === 'cluster' ? '⟳' : '✦'}</span>
+        <span className="hidden md:inline">
+          {mode === 'cluster' ? 'Travel Through Time' : 'Back to Constellations'}
+        </span>
       </button>
 
       {/* === TUNNEL OVERLAY === */}
@@ -171,31 +175,36 @@ export default function Galaxy() {
 
       {/* === CLUSTER OVERLAY === */}
       {mode === 'cluster' && (
-        <div className="absolute bottom-6 left-1/2 z-10 flex max-w-[90vw] -translate-x-1/2 flex-wrap justify-center gap-2">
-          <button
-            data-hoverable
-            onClick={() => setActiveGenre(null)}
-            className={`rounded-full px-3 py-1.5 font-ui text-xs transition-colors ${
-              activeGenre === null ? 'bg-text-primary text-void' : 'glass text-text-secondary'
-            }`}
+        <div className="absolute inset-x-0 bottom-40 z-10 px-3 md:bottom-6 md:left-1/2 md:inset-x-auto md:-translate-x-1/2 md:px-0">
+          <div
+            className="flex items-center gap-2 overflow-x-auto pb-1 md:max-w-[90vw] md:flex-wrap md:justify-center md:overflow-visible"
+            style={{ scrollbarWidth: 'none' }}
           >
-            All
-          </button>
-          {constellations.map((c) => (
             <button
-              key={c.genre}
               data-hoverable
-              onClick={() => setActiveGenre(activeGenre === c.genre ? null : c.genre)}
-              className="rounded-full px-3 py-1.5 font-ui text-xs transition-all"
-              style={{
-                background: activeGenre === c.genre ? `${c.color}33` : 'rgba(20,20,31,0.6)',
-                color: activeGenre === c.genre ? c.color : 'rgba(242,240,255,0.6)',
-                border: `1px solid ${activeGenre === c.genre ? c.color : 'rgba(255,255,255,0.06)'}`,
-              }}
+              onClick={() => setActiveGenre(null)}
+              className={`shrink-0 rounded-full px-3 py-1.5 font-ui text-xs transition-colors ${
+                activeGenre === null ? 'bg-text-primary text-void' : 'glass text-text-secondary'
+              }`}
             >
-              {c.genre}
+              All
             </button>
-          ))}
+            {constellations.map((c) => (
+              <button
+                key={c.genre}
+                data-hoverable
+                onClick={() => setActiveGenre(activeGenre === c.genre ? null : c.genre)}
+                className="shrink-0 rounded-full px-3 py-1.5 font-ui text-xs transition-all"
+                style={{
+                  background: activeGenre === c.genre ? `${c.color}33` : 'rgba(20,20,31,0.6)',
+                  color: activeGenre === c.genre ? c.color : 'rgba(242,240,255,0.6)',
+                  border: `1px solid ${activeGenre === c.genre ? c.color : 'rgba(255,255,255,0.06)'}`,
+                }}
+              >
+                {c.genre}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
