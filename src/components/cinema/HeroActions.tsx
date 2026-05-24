@@ -13,6 +13,7 @@ interface Action {
   hint: string;
   onClick: () => void;
   primary?: boolean;
+  wide?: boolean; // spans both grid columns on mobile
   curve: number; // vertical offset for the arc
 }
 
@@ -57,7 +58,7 @@ export default function HeroActions() {
     { label: 'By mood', icon: '◐', hint: '', onClick: () => navigate('/discover'), curve: 0 },
     { label: 'Curator', icon: '✺', hint: 'AI', onClick: () => openCompanion('What should I watch tonight?'), curve: 0 },
     { label: 'Time tunnel', icon: '⟳', hint: '', onClick: () => navigate('/galaxy'), curve: 0 },
-    { label: 'Search', icon: '⌕', hint: '', onClick: () => navigate('/search'), curve: 0 },
+    { label: 'Search', icon: '⌕', hint: '', onClick: () => navigate('/search'), curve: 0, wide: true },
   ];
 
   return (
@@ -75,7 +76,7 @@ export default function HeroActions() {
             whileHover={{ scale: 1.04 }}
             className={`group relative flex h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 font-ui text-xs font-semibold transition-colors disabled:opacity-50 sm:h-10 sm:w-36 sm:shrink-0 ${
               a.primary ? 'col-span-2 bg-grad text-white shadow-glow-crimson sm:col-span-1' : 'glass glass-hover text-text-primary'
-            }`}
+            } ${a.wide ? 'col-span-2 sm:col-span-1' : ''}`}
           >
             <span className="shrink-0 text-sm" style={{ color: a.primary ? '#fff' : 'var(--accent-gold)' }}>
               {a.icon}

@@ -28,7 +28,7 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-void to-transparent" />
 
           {/* overlaid copy */}
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-start px-6 pt-[20vh] text-center">
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-start px-6 pt-[12vh] text-center md:pt-[20vh]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="display-fluid max-w-5xl text-6xl text-text-primary md:text-8xl"
+              className="display-fluid max-w-5xl text-5xl text-text-primary md:text-8xl"
             >
               A universe of cinema,
               <br />
@@ -66,7 +66,7 @@ export default function Home() {
         </section>
 
         {/* ROWS */}
-        <div className="relative z-10 -mt-12 px-6 md:px-12">
+        <div className="relative z-10 px-6 md:-mt-12 md:px-12">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
