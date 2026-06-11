@@ -6,7 +6,7 @@ import type { ChatMessage } from '@/types/ai';
 const PROXY_URL = import.meta.env.VITE_AI_PROXY_URL as string;
 
 interface ChatResponse {
-  choices: { message: { content: string } }[];
+  choices: { message: { content: string; reasoning?: string } }[];
 }
 
 export async function chat(messages: ChatMessage[], temperature = 0.8): Promise<string> {
@@ -15,7 +15,10 @@ export async function chat(messages: ChatMessage[], temperature = 0.8): Promise<
     { messages, temperature },
     { headers: { 'Content-Type': 'application/json' } },
   );
-  return data.choices[0]?.message?.content ?? '';
+  const msg = data.choices[0]?.message;
+  // Reasoning models occasionally emit an empty content with the answer left
+  // in `reasoning` — fall back so JSON extraction still has something to parse.
+  return msg?.content || msg?.reasoning || '';
 }
 
 // Extract first JSON array/object from a model response that may wrap it in prose or code fences.

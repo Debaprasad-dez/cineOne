@@ -57,7 +57,7 @@ export default function HeroActions() {
     { label: 'Tonight', icon: '🌙', hint: 'AI', onClick: doTonight, curve: 0 },
     { label: 'By mood', icon: '◐', hint: '', onClick: () => navigate('/discover'), curve: 0 },
     { label: 'Curator', icon: '✺', hint: 'AI', onClick: () => openCompanion('What should I watch tonight?'), curve: 0 },
-    { label: 'Time tunnel', icon: '⟳', hint: '', onClick: () => navigate('/galaxy'), curve: 0 },
+    { label: 'Time tunnel', icon: '⟳', hint: '', onClick: () => navigate('/galaxy?view=tunnel'), curve: 0 },
     { label: 'Search', icon: '⌕', hint: '', onClick: () => navigate('/search'), curve: 0, wide: true },
   ];
 

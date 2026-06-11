@@ -139,11 +139,11 @@ body {
   min-height: 100vh;
 }
 
-/* Hide native cursor on devices with a fine pointer (desktop) */
-@media (pointer: fine) {
-  * {
-    cursor: none !important;
-  }
+/* Hide the native cursor only while the custom cursor is running.
+   CursorProvider adds this class when it activates, so the two can
+   never get out of sync (e.g. on touchscreen laptops). */
+html.custom-cursor * {
+  cursor: none !important;
 }
 
 /* Custom scrollbar */
@@ -263,6 +263,7 @@ body {
   z-index: 9999;
   border-radius: 50%;
   will-change: transform;
+  opacity: 0; /* revealed by CursorProvider on first mousemove */
 }
 .cursor-dot {
   width: 8px;

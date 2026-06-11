@@ -28,11 +28,25 @@ export default function AICompanion() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const orbRef = useRef<HTMLButtonElement>(null);
   const pageContext = usePageContext();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, busy]);
+
+  // Click anywhere outside the panel (and not on the orb) closes the companion.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (panelRef.current?.contains(t) || orbRef.current?.contains(t)) return;
+      setOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [open, setOpen]);
 
   // When opened with a seed prompt (e.g. from the hero), prefill the input.
   useEffect(() => {
@@ -63,6 +77,7 @@ export default function AICompanion() {
     <>
       {/* Orb */}
       <motion.button
+        ref={orbRef}
         data-hoverable
         onClick={() => setOpen(!open)}
         whileHover={{ scale: 1.08 }}
@@ -102,6 +117,7 @@ export default function AICompanion() {
       <AnimatePresence>
         {open && (
           <motion.div
+            ref={panelRef}
             initial={{ x: 400, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}

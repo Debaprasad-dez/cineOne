@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { chat, parseJSON } from '@/services/openrouter';
-import { searchMovies } from '@/services/tmdb';
+import { searchMovies, discoverMovies, type DiscoverParams } from '@/services/tmdb';
+import { GENRE_MAP } from '@/utils/constants';
 import type { AIRecommendation, ChatMessage, MoodQuery } from '@/types/ai';
 import type { TMDBMovie } from '@/types/movie';
 
@@ -8,6 +9,39 @@ export interface MoodResult {
   movie: TMDBMovie;
   why: string;
   notes: string;
+}
+
+// When the AI path yields nothing (parse failure, rate limit, hallucinated
+// titles), fall back to a plain TMDB discover query built from the same
+// filters so the user never lands on an empty screen.
+async function tmdbFallback(q: MoodQuery): Promise<MoodResult[]> {
+  const genreIds = Object.entries(GENRE_MAP)
+    .filter(([, name]) => q.genres.includes(name))
+    .map(([id]) => id);
+
+  const params: DiscoverParams = {
+    sort_by: 'vote_average.desc',
+    'vote_count.gte': 300,
+    'primary_release_date.gte': `${q.era[0]}-01-01`,
+    'primary_release_date.lte': `${q.era[1] + 9}-12-31`,
+  };
+  if (genreIds.length) params.with_genres = genreIds.join(',');
+  if (q.runtime === '<90') params['with_runtime.lte'] = 90;
+  else if (q.runtime === '90-150') {
+    params['with_runtime.gte'] = 90;
+    params['with_runtime.lte'] = 150;
+  } else if (q.runtime === '150+') params['with_runtime.gte'] = 150;
+
+  const movies = await discoverMovies(params);
+  const moodLabel = q.moods.join(' · ').toLowerCase() || 'your';
+  return movies
+    .filter((m) => m.poster_path)
+    .slice(0, 12)
+    .map((movie) => ({
+      movie,
+      why: `A highly rated ${q.era[0]}s–${q.era[1]}s pick matching your ${moodLabel} frequency.`,
+      notes: '',
+    }));
 }
 
 async function recommendByMood(q: MoodQuery): Promise<MoodResult[]> {
@@ -23,20 +57,31 @@ async function recommendByMood(q: MoodQuery): Promise<MoodResult[]> {
     },
   ];
 
-  const raw = await chat(messages, 0.85);
-  const recs = parseJSON<AIRecommendation[]>(raw) ?? [];
+  let results: MoodResult[] = [];
+  try {
+    const raw = await chat(messages, 0.85);
+    const recs = parseJSON<AIRecommendation[]>(raw) ?? [];
 
-  const results = await Promise.all(
-    recs.slice(0, 12).map(async (r) => {
-      const found = await searchMovies(`${r.title}`);
-      const movie =
-        found.find((m) => yearMatch(m.release_date, r.year)) ?? found[0];
-      if (!movie) return null;
-      return { movie, why: r.why_you_match, notes: r.emotional_notes } satisfies MoodResult;
-    }),
-  );
+    const found = await Promise.all(
+      recs.slice(0, 12).map(async (r) => {
+        const candidates = await searchMovies(`${r.title}`).catch(() => []);
+        const movie =
+          candidates.find((m) => yearMatch(m.release_date, r.year)) ?? candidates[0];
+        if (!movie) return null;
+        return { movie, why: r.why_you_match, notes: r.emotional_notes } satisfies MoodResult;
+      }),
+    );
 
-  return results.filter((x): x is MoodResult => x !== null);
+    // dedupe — the AI sometimes resolves multiple titles to the same film
+    const seen = new Set<number>();
+    results = found.filter(
+      (x): x is MoodResult => x !== null && !seen.has(x.movie.id) && !!seen.add(x.movie.id),
+    );
+  } catch {
+    results = [];
+  }
+
+  return results.length > 0 ? results : tmdbFallback(q);
 }
 
 function yearMatch(date: string, year: number): boolean {

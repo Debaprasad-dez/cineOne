@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useTrending, usePopular, useTopRated, useHiddenGems } from '@/hooks/useTMDB';
 import { getTimeMood } from '@/utils/timeOfDay';
 import MovieRow from '@/components/cinema/MovieRow';
+import ContinueWatchingRow from '@/components/cinema/ContinueWatchingRow';
 import PageTransition from '@/components/layout/PageTransition';
 import HeroGalaxy from '@/components/three/HeroGalaxy';
 import HeroActions from '@/components/cinema/HeroActions';
@@ -76,10 +77,11 @@ export default function Home() {
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-text-muted">{mood.subtitle}</span>
           </motion.div>
 
-          <MovieRow title="Trending Now" movies={trending.data} loading={trending.isLoading} accent={mood.accent} />
-          <MovieRow title={`Matching ${mood.title}`} movies={popular.data} loading={popular.isLoading} accent={mood.accent} />
-          <MovieRow title="The Cinematic Canon" movies={topRated.data} loading={topRated.isLoading} accent="#C9954C" />
-          <MovieRow title="Hidden Gems" movies={gems.data} loading={gems.isLoading} accent="#4ECDC4" />
+          <ContinueWatchingRow />
+          <MovieRow title="Trending Now" movies={trending.data} loading={trending.isLoading} accent={mood.accent} seeAllTo="/collection/trending" />
+          <MovieRow title={`Matching ${mood.title}`} movies={popular.data} loading={popular.isLoading} accent={mood.accent} seeAllTo="/collection/popular" />
+          <MovieRow title="The Cinematic Canon" movies={topRated.data} loading={topRated.isLoading} accent="#C9954C" seeAllTo="/collection/top-rated" />
+          <MovieRow title="Hidden Gems" movies={gems.data} loading={gems.isLoading} accent="#4ECDC4" seeAllTo="/collection/hidden-gems" />
         </div>
       </div>
     </PageTransition>

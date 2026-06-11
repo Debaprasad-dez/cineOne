@@ -12,15 +12,18 @@ export default function PlayerOverlay() {
 
   return (
     <AnimatePresence>
-      {playerMovie && <Inner id={playerMovie.id} onClose={closePlayer} />}
+      {playerMovie && (
+        <Inner id={playerMovie.id} resumeAt={playerMovie.resumeAt} onClose={closePlayer} />
+      )}
     </AnimatePresence>
   );
 }
 
-function Inner({ id, onClose }: { id: number; onClose: () => void }) {
+function Inner({ id, resumeAt, onClose }: { id: number; resumeAt?: number; onClose: () => void }) {
   const { data: movie } = useMovie(id);
-  const { toggleWatched, isWatched } = useUserStore();
+  const { toggleWatched, isWatched, saveProgress, clearProgress } = useUserStore();
   const stageRef = useRef<HTMLDivElement>(null);
+  const lastSave = useRef(0);
 
   const accent =
     getComputedStyle(document.documentElement).getPropertyValue('--accent-crimson').trim().replace('#', '') || 'e8624a';
@@ -60,9 +63,27 @@ function Inner({ id, onClose }: { id: number; onClose: () => void }) {
           tmdbId={id}
           color={accent}
           autoPlay
+          startAt={resumeAt}
           className="rounded-none"
           onProgress={(p) => {
-            if (p.progress >= 90 && movie && !isWatched(id)) toggleWatched(movie);
+            if (p.progress >= 90) {
+              // finished — mark watched, drop from continue-watching
+              if (movie && !isWatched(id)) toggleWatched(movie);
+              clearProgress(id);
+              return;
+            }
+            // persist resume point at most every 5s, once past the first 30s
+            if (movie && p.currentTime > 30 && Date.now() - lastSave.current > 5000) {
+              lastSave.current = Date.now();
+              saveProgress({
+                id,
+                title: movie.title,
+                poster_path: movie.poster_path,
+                currentTime: p.currentTime,
+                duration: p.duration,
+                progress: p.progress,
+              });
+            }
           }}
         />
       </div>

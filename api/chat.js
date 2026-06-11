@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://debaprasad-dez.github.io/ciner/',
-        'X-Title': 'CineAI',
+        'X-Title': 'CinemaOne',
       },
       body: JSON.stringify({ model: MODEL, messages, temperature }),
     });

@@ -77,14 +77,14 @@ export default function Sidebar() {
       className="fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-glass bg-void-2/70 py-6 backdrop-blur-glass md:flex"
     >
       <div className="mb-10 flex items-center gap-3 px-5">
-        <img src={`${import.meta.env.BASE_URL}film.svg`} alt="CineAI" className="h-9 w-9 shrink-0" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="CinemaOne" className="h-9 w-9 shrink-0 object-contain" />
         {expanded && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="font-display text-xl italic text-text-primary"
+            className="whitespace-nowrap font-ui text-xl font-bold tracking-tight text-text-primary"
           >
-            CineAI
+            Cinema<span className="text-accent-violet">One</span>
           </motion.span>
         )}
       </div>

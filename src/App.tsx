@@ -9,6 +9,7 @@ import RouteCurtain from '@/components/layout/RouteCurtain';
 import AICompanion from '@/components/ai/AICompanion';
 import PlayerOverlay from '@/components/cinema/PlayerOverlay';
 import Home from '@/pages/Home';
+import Collection from '@/pages/Collection';
 import Discover from '@/pages/Discover';
 import Galaxy from '@/pages/Galaxy';
 import Search from '@/pages/Search';
@@ -43,6 +44,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
+            <Route path="/collection/:key" element={<Collection />} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/galaxy" element={<Galaxy />} />
             <Route path="/search" element={<Search />} />

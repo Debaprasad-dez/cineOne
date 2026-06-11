@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGalaxyMovies, useTimelineMovies } from '@/hooks/useTMDB';
 import { buildGalaxy, type GalaxyNode } from '@/utils/galaxy';
 import { yearOf, ratingPct } from '@/utils/formatters';
@@ -13,10 +13,12 @@ export default function Galaxy() {
   const { data: movies, isLoading } = useGalaxyMovies();
   const { data: timeline } = useTimelineMovies();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
   const [selected, setSelected] = useState<GalaxyNode | null>(null);
   const [hovered, setHovered] = useState<GalaxyNode | null>(null);
-  const [mode, setMode] = useState<GalaxyMode>('cluster');
+  // ?view=tunnel deep-links straight into the time tunnel (e.g. hero "Time tunnel" button)
+  const [mode, setMode] = useState<GalaxyMode>(searchParams.get('view') === 'tunnel' ? 'tunnel' : 'cluster');
 
   // tunnel state
   const [tunnelHover, setTunnelHover] = useState<{ movie: TMDBMovie; decade: number } | null>(null);
@@ -105,7 +107,11 @@ export default function Galaxy() {
           setSelected(null);
           setTunnelHover(null);
           setTunnelProgress(0);
-          setMode((m) => (m === 'cluster' ? 'tunnel' : 'cluster'));
+          setMode((m) => {
+            const next = m === 'cluster' ? 'tunnel' : 'cluster';
+            setSearchParams(next === 'tunnel' ? { view: 'tunnel' } : {}, { replace: true });
+            return next;
+          });
         }}
         className="glass glass-hover absolute right-4 top-4 z-20 flex items-center gap-2 px-3 py-2 font-ui text-xs text-text-primary md:right-6 md:top-6 md:px-4 md:py-2.5 md:text-sm"
         aria-label={mode === 'cluster' ? 'Travel through time' : 'Back to constellations'}
@@ -119,13 +125,18 @@ export default function Galaxy() {
       {/* === TUNNEL OVERLAY === */}
       {mode === 'tunnel' && (
         <>
+          {/* cinematic vignette over the 3D scene */}
+          <div className="pointer-events-none absolute inset-0 z-[5] bg-[radial-gradient(ellipse_70%_60%_at_center,transparent_55%,rgba(3,3,6,0.75)_100%)]" />
+
           {/* big decade readout */}
           <div className="pointer-events-none absolute bottom-24 left-1/2 z-10 -translate-x-1/2 text-center">
             <motion.div
               key={tunnelDecade}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
               className="display-fluid text-6xl text-accent-gold md:text-8xl"
+              style={{ textShadow: '0 0 32px rgba(232,161,74,0.55), 0 0 80px rgba(232,98,74,0.3)' }}
             >
               {tunnelDecade}s
             </motion.div>

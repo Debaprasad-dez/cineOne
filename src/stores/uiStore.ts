@@ -11,6 +11,7 @@ export interface ActiveMovie {
 export interface PlayerMovie {
   id: number;
   title: string;
+  resumeAt?: number; // seconds — resume playback from here
 }
 
 interface UIState {

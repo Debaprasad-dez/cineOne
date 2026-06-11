@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import type { TMDBMovie } from '@/types/movie';
 import MovieCard, { MovieCardSkeleton } from './MovieCard';
 
@@ -7,14 +8,27 @@ interface Props {
   movies?: TMDBMovie[];
   loading?: boolean;
   accent?: string;
+  seeAllTo?: string; // route for the full-collection page; falls back to scrolling
 }
 
-export default function MovieRow({ title, movies, loading, accent = '#E8624A' }: Props) {
+export default function MovieRow({ title, movies, loading, accent = '#E8624A', seeAllTo }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: 1 | -1) => {
     trackRef.current?.scrollBy({ left: dir * 600, behavior: 'smooth' });
   };
+
+  const seeAllInner = (
+    <>
+      <span className="link-underline">See all</span>
+      <span
+        className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+        style={{ color: accent }}
+      >
+        →
+      </span>
+    </>
+  );
 
   return (
     <section className="mb-16">
@@ -26,19 +40,23 @@ export default function MovieRow({ title, movies, loading, accent = '#E8624A' }:
           </div>
           <h2 className="display-fluid text-3xl text-text-primary md:text-4xl">{title}</h2>
         </div>
-        <button
-          data-hoverable
-          onClick={() => scroll(1)}
-          className="group flex items-center gap-1.5 font-ui text-sm text-text-secondary transition-colors hover:text-text-primary"
-        >
-          <span className="link-underline">See all</span>
-          <span
-            className="inline-block transition-transform duration-300 group-hover:translate-x-1"
-            style={{ color: accent }}
+        {seeAllTo ? (
+          <Link
+            to={seeAllTo}
+            data-hoverable
+            className="group flex items-center gap-1.5 font-ui text-sm text-text-secondary transition-colors hover:text-text-primary"
           >
-            →
-          </span>
-        </button>
+            {seeAllInner}
+          </Link>
+        ) : (
+          <button
+            data-hoverable
+            onClick={() => scroll(1)}
+            className="group flex items-center gap-1.5 font-ui text-sm text-text-secondary transition-colors hover:text-text-primary"
+          >
+            {seeAllInner}
+          </button>
+        )}
       </div>
 
       <div className="relative">

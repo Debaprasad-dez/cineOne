@@ -9,6 +9,7 @@ import {
   discoverMovies,
   type DiscoverParams,
 } from '@/services/tmdb';
+import type { TMDBMovie } from '@/types/movie';
 
 export const useTrending = () =>
   useQuery({ queryKey: ['trending'], queryFn: () => getTrending('week') });
@@ -82,3 +83,41 @@ export const useHiddenGems = () =>
         'vote_count.lte': 1000,
       }),
   });
+
+// Full collection pages for the "See all" view — several TMDB pages merged.
+export type CollectionKey = 'trending' | 'popular' | 'top-rated' | 'hidden-gems';
+
+export const COLLECTION_META: Record<CollectionKey, { title: string; accent: string }> = {
+  trending: { title: 'Trending Now', accent: '#E8624A' },
+  popular: { title: 'Popular Picks', accent: '#7B5EA7' },
+  'top-rated': { title: 'The Cinematic Canon', accent: '#C9954C' },
+  'hidden-gems': { title: 'Hidden Gems', accent: '#4ECDC4' },
+};
+
+async function fetchCollection(key: CollectionKey): Promise<TMDBMovie[]> {
+  const pages = [1, 2, 3];
+  const lists = await Promise.all(
+    pages.map((page) => {
+      switch (key) {
+        case 'trending':
+          return getTrending('week'); // trending endpoint ignores page granularity we need
+        case 'popular':
+          return getPopular(page);
+        case 'top-rated':
+          return getTopRated(page);
+        case 'hidden-gems':
+          return discoverMovies({
+            sort_by: 'vote_average.desc',
+            'vote_count.gte': 100,
+            'vote_count.lte': 1000,
+            page,
+          });
+      }
+    }),
+  );
+  const seen = new Set<number>();
+  return lists.flat().filter((m) => m.poster_path && !seen.has(m.id) && !!seen.add(m.id));
+}
+
+export const useCollection = (key: CollectionKey) =>
+  useQuery({ queryKey: ['collection', key], queryFn: () => fetchCollection(key) });

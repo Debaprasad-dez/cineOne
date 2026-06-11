@@ -182,6 +182,11 @@ export default function Discover() {
                   Curator unavailable right now. Try again in a moment.
                 </p>
               )}
+              {!rec.isPending && rec.data && rec.data.length === 0 && (
+                <p className="font-ui text-text-secondary">
+                  No films matched this exact frequency. Loosen a filter or two and try again.
+                </p>
+              )}
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                 {rec.isPending
                   ? Array.from({ length: 12 }).map((_, i) => <MovieCardSkeleton key={i} />)

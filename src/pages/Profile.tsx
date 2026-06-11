@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import PageTransition from '@/components/layout/PageTransition';
@@ -39,6 +40,88 @@ function archetype(vec: number[]): string {
   return map[top] ?? 'The Cinephile';
 }
 
+function IdentityCard() {
+  const { name, dob, setProfile } = useUserStore();
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(name);
+  const [draftDob, setDraftDob] = useState(dob);
+
+  const save = () => {
+    setProfile(draftName.trim(), draftDob);
+    setEditing(false);
+  };
+
+  if (!editing)
+    return (
+      <div className="mt-3 flex flex-col items-center gap-1">
+        {name && <div className="font-ui text-lg font-semibold text-text-primary">{name}</div>}
+        {dob && (
+          <div className="font-mono text-xs text-text-muted">
+            born {new Date(dob).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
+        )}
+        <button
+          data-hoverable
+          onClick={() => {
+            setDraftName(name);
+            setDraftDob(dob);
+            setEditing(true);
+          }}
+          className="link-underline mt-1 font-ui text-xs text-accent-teal"
+        >
+          {name || dob ? 'Edit details' : 'Add your name & birthday'}
+        </button>
+      </div>
+    );
+
+  return (
+    <div className="glass mt-3 w-full max-w-xs space-y-3 p-4 text-left">
+      <div>
+        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-text-muted">
+          Name <span className="normal-case">(optional)</span>
+        </label>
+        <input
+          data-hoverable
+          value={draftName}
+          onChange={(e) => setDraftName(e.target.value)}
+          placeholder="What should we call you?"
+          maxLength={40}
+          className="w-full rounded-xl border border-glass bg-void px-3 py-2 font-ui text-sm outline-none placeholder:text-text-muted focus:border-glass-hover"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-text-muted">
+          Date of birth <span className="normal-case">(optional)</span>
+        </label>
+        <input
+          data-hoverable
+          type="date"
+          value={draftDob}
+          max={new Date().toISOString().slice(0, 10)}
+          onChange={(e) => setDraftDob(e.target.value)}
+          className="w-full rounded-xl border border-glass bg-void px-3 py-2 font-ui text-sm text-text-primary outline-none focus:border-glass-hover [color-scheme:dark]"
+        />
+      </div>
+      <div className="flex gap-2 pt-1">
+        <button
+          data-hoverable
+          onClick={save}
+          className="flex-1 rounded-full bg-gradient-to-r from-accent-crimson to-accent-violet py-2 font-ui text-xs font-semibold text-white"
+        >
+          Save
+        </button>
+        <button
+          data-hoverable
+          onClick={() => setEditing(false)}
+          className="glass glass-hover flex-1 rounded-full py-2 font-ui text-xs text-text-secondary"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Profile() {
   const { watched, watchlist } = useUserStore();
   const vec = tasteVector([...watched, ...watchlist]);
@@ -51,6 +134,7 @@ export default function Profile() {
           {/* Left */}
           <div className="flex flex-col items-center text-center">
             <div className="h-28 w-28 rounded-full bg-gradient-to-br from-accent-violet to-accent-crimson" />
+            <IdentityCard />
             <h2 className="mt-4 font-display text-2xl italic">{archetype(vec)}</h2>
             <p className="font-ui text-sm text-text-muted">Your movie personality</p>
             <div className="mt-6 flex gap-6 font-mono text-sm">

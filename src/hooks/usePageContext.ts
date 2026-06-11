@@ -14,7 +14,7 @@ export function usePageContext(): string {
       ? `The user has ${watched.length} watched and ${watchlist.length} saved films.`
       : 'The user has no watch history yet.';
 
-  let where = 'browsing CineAI';
+  let where = 'browsing CinemaOne';
   if (pathname === '/') where = 'on the home screen';
   else if (pathname === '/discover') where = 'tuning the mood-based discovery controls';
   else if (pathname === '/galaxy') where = 'exploring the 3D movie galaxy';

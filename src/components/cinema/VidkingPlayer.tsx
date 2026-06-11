@@ -20,6 +20,7 @@ interface Props {
   episode?: number;
   color?: string; // hex without '#'
   autoPlay?: boolean;
+  startAt?: number; // seconds — resume position
   onProgress?: (p: VidkingProgress['data']) => void;
   className?: string;
 }
@@ -33,6 +34,7 @@ export default function VidkingPlayer({
   episode = 1,
   color = 'e8624a',
   autoPlay = false,
+  startAt,
   onProgress,
   className = '',
 }: Props) {
@@ -40,7 +42,8 @@ export default function VidkingPlayer({
     type === 'movie'
       ? `${VIDKING_BASE}/movie/${tmdbId}`
       : `${VIDKING_BASE}/tv/${tmdbId}/${season}/${episode}`;
-  const src = `${path}?color=${color}&autoPlay=${autoPlay}`;
+  const resume = startAt && startAt > 0 ? `&progress=${Math.floor(startAt)}` : '';
+  const src = `${path}?color=${color}&autoPlay=${autoPlay}${resume}`;
 
   useEffect(() => {
     if (!onProgress) return;
@@ -56,7 +59,7 @@ export default function VidkingPlayer({
     <div className={`relative aspect-video w-full overflow-hidden rounded-2xl bg-void-2 ${className}`}>
       <iframe
         src={src}
-        title="CineAI player"
+        title="CinemaOne player"
         className="absolute inset-0 h-full w-full"
         frameBorder={0}
         allowFullScreen
