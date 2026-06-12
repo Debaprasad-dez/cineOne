@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://debaprasad-dez.github.io/ciner/',
+        'HTTP-Referer': 'https://debaprasad-dez.github.io/cineOne/',
         'X-Title': 'CinemaOne',
       },
       body: JSON.stringify({ model: MODEL, messages, temperature }),
